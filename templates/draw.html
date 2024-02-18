@@ -1,27 +1,52 @@
 <!DOCTYPE html>
 <html>
-  <head>
+<head>
     <title>Drawing App</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/4.0.1/socket.io.js" integrity="sha512-q/dWJ3kcmjBLU4Qc47E4A9kTB4m3wuTY7vkFJDTZKjTs8jhyGQnaUrxa0Ytd0ssMZhbNua9hE+E7Qv1j+DyZwA==" crossorigin="anonymous"></script>
     <script type="text/javascript" src="http://ajax.googleapis.com/ajax/libs/jquery/1.4.2/jquery.js"></script>
     <link rel="stylesheet" type="text/css" href="../static/styles_draw.css") }}">
     <script type="text/javascript" src="../static/draw.js"></script>
+    <script type="text/javascript">
+        // Initialize socket
+        var socket = io.connect();
+        socket.on('members_update', function(data) {
+            var membersList = document.getElementById('membersList');
+            membersList.innerHTML = ''; // Clear previous list items
+            data.forEach(function(member) {
+                var listItem = document.createElement('li');
+                listItem.textContent = member.name + ": " + member.score;
+                membersList.appendChild(listItem);
+            });
+        });
 
+        function save() {
+            var canvas = document.getElementById('canvas');
+            var dataURL = canvas.toDataURL(); // Get canvas data as base64 image
+            socket.emit('canvas_data', dataURL); // Emit canvas data to the server
+            return true; // Allow form submission
+        }
+    </script>
 </head>
-    <header>
-        Draw a {{object}}
-    </header>
+<header>
+    Room: {{code}} Draw a {{object}}
+</header>
+
 <body>
-    <form id = "myForm" action="{{ url_for('predict')}}" method="POST" enctype="multipart/form-data">
-        <canvas id="canvas", name ="draw" width="100" height="100">
+<form id="myForm">
+    <canvas id="canvas" name="draw" width="100" height="100">
         <script type="text/javascript">
             $(document).ready(function() {
                 drawCanvas();
             });
         </script>
-        </canvas>
-        <input type="hidden" id = 'url' name="url" value="">
-        <input type="submit" id = 'predict' value="Predict" onclick="return save();">
-    </form>
-    
-    </body>
+    </canvas>
+    <input type="button" id="predict" value="Predict" onclick="return save();">
+</form>
+<h1>Scores:</h1>
+<ul id="membersList">
+    <!-- Members list will be dynamically added here -->
+</ul>
+
+</body>
 </html>
+ 

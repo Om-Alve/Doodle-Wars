@@ -4,7 +4,7 @@ var clickX = [];
 var clickY = [];
 var clickDrag = [];
 var paint = false;
-var curColor = "#000000";
+var curColor = "red";
 
 /**
     - Preparing the Canvas : Basic functions
